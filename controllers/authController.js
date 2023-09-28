@@ -112,6 +112,8 @@ const login = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
+
+
 const logout = async (req, res) => {
   await Token.findOneAndDelete({ user: req.user.userId });
 
@@ -155,6 +157,8 @@ const forgotPassword = async (req, res) => {
     .status(StatusCodes.OK)
     .json({ msg: 'Please check your email for reset password link' });
 };
+
+
 const resetPassword = async (req, res) => {
   const { token, email, password } = req.body;
   if (!token || !email || !password) {
@@ -179,6 +183,25 @@ const resetPassword = async (req, res) => {
   res.send('reset password');
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+console.log("userId:",userId)
+    // Find and delete the user by ID
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: 'User not found' });
+    }
+
+    res.status(StatusCodes.OK).json({ msg: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: 'Error deleting user' });
+  }
+};
+
+
 module.exports = {
   register,
   login,
@@ -186,4 +209,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  deleteUser
 };
